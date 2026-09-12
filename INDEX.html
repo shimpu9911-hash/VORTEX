@@ -1,0 +1,3120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VORTEX — Global Logistics</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#03070b;
+  --bg2:#06111b;
+  --card:#091722;
+  --blue:#00a8ff;
+  --cyan:#3de4ff;
+  --green:#36e5a1;
+  --white:#f5f8fb;
+  --muted:#82909d;
+  --line:rgba(255,255,255,.09);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:auto;
+}
+
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:Inter,sans-serif;
+  overflow-x:hidden;
+}
+
+body::selection{
+  background:var(--cyan);
+  color:#000;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.container{
+  width:min(1240px,calc(100% - 48px));
+  margin:auto;
+}
+
+.noise{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:999;
+  opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+/* ================= CURSOR ================= */
+
+.cursor{
+  position:fixed;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 20px var(--cyan);
+  pointer-events:none;
+  z-index:10000;
+  transform:translate(-50%,-50%);
+}
+
+.cursor-ring{
+  position:fixed;
+  width:38px;
+  height:38px;
+  border:1px solid rgba(61,228,255,.55);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:
+    width .25s var(--ease),
+    height .25s var(--ease),
+    background .25s;
+}
+
+/* ================= PROGRESS ================= */
+
+.scroll-progress{
+  position:fixed;
+  top:0;
+  left:0;
+  width:0%;
+  height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  z-index:10001;
+  box-shadow:0 0 15px var(--cyan);
+}
+
+/* ================= NAV ================= */
+
+.nav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  z-index:900;
+  padding:26px 0;
+  transition:.6s var(--ease);
+}
+
+.nav.scrolled{
+  padding:13px 0;
+  background:rgba(3,7,11,.72);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--line);
+}
+
+.nav-inner{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-family:"Space Grotesk";
+  font-size:25px;
+  font-weight:800;
+  letter-spacing:-1.5px;
+}
+
+.logo span{
+  color:var(--cyan);
+}
+
+.nav-links{
+  display:flex;
+  gap:34px;
+  font-size:13px;
+  color:#8998a6;
+}
+
+.nav-links a{
+  position:relative;
+  transition:.3s;
+}
+
+.nav-links a:hover{
+  color:#fff;
+}
+
+.nav-links a::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-8px;
+  width:0;
+  height:1px;
+  background:var(--cyan);
+  transition:.35s var(--ease);
+}
+
+.nav-links a:hover::after{
+  width:100%;
+}
+
+.nav-cta{
+  border:1px solid rgba(61,228,255,.3);
+  color:#fff;
+  background:rgba(0,168,255,.07);
+  border-radius:50px;
+  padding:12px 20px;
+  transition:.4s var(--ease);
+}
+
+.nav-cta:hover{
+  background:var(--blue);
+  box-shadow:0 0 35px rgba(0,168,255,.3);
+}
+
+.menu{
+  display:none;
+  background:none;
+  border:0;
+  color:#fff;
+  font-size:25px;
+}
+
+/* ================= HERO ================= */
+
+.hero{
+  min-height:100vh;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  background:
+    radial-gradient(circle at 75% 48%,rgba(0,168,255,.14),transparent 28%),
+    radial-gradient(circle at 20% 70%,rgba(0,168,255,.05),transparent 30%),
+    #03070b;
+}
+
+.hero-grid{
+  position:absolute;
+  inset:-20%;
+  opacity:.18;
+  background-image:
+    linear-gradient(rgba(61,228,255,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(61,228,255,.07) 1px,transparent 1px);
+  background-size:70px 70px;
+  transform:perspective(700px) rotateX(60deg);
+  transform-origin:center bottom;
+  animation:gridMove 15s linear infinite;
+}
+
+@keyframes gridMove{
+  to{
+    background-position:0 700px;
+  }
+}
+
+.hero-content{
+  position:relative;
+  z-index:10;
+  max-width:700px;
+  padding-top:90px;
+}
+
+.eyebrow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:var(--cyan);
+  text-transform:uppercase;
+  letter-spacing:2.7px;
+  font-size:10px;
+  margin-bottom:25px;
+}
+
+.live-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 15px var(--green);
+  animation:live 1.5s infinite;
+}
+
+@keyframes live{
+  50%{
+    opacity:.25;
+    transform:scale(.7);
+  }
+}
+
+.hero h1{
+  font-family:"Space Grotesk";
+  font-size:clamp(60px,8vw,112px);
+  line-height:.83;
+  letter-spacing:-7px;
+  font-weight:700;
+}
+
+.hero h1 .outline{
+  color:transparent;
+  -webkit-text-stroke:1px rgba(255,255,255,.72);
+}
+
+.hero-sub{
+  max-width:520px;
+  color:var(--muted);
+  line-height:1.8;
+  margin-top:30px;
+  font-size:15px;
+}
+
+.hero-actions{
+  display:flex;
+  gap:13px;
+  margin-top:35px;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:50px;
+  padding:0 23px;
+  border-radius:50px;
+  transition:.45s var(--ease);
+}
+
+.btn-primary{
+  color:#001019;
+  background:linear-gradient(120deg,var(--cyan),#009ce9);
+  font-weight:700;
+  box-shadow:0 12px 45px rgba(0,168,255,.2);
+}
+
+.btn-primary:hover{
+  box-shadow:0 20px 60px rgba(0,168,255,.4);
+}
+
+.btn-outline{
+  border:1px solid var(--line);
+  color:#d6dee5;
+}
+
+.btn-outline:hover{
+  background:rgba(255,255,255,.05);
+}
+
+/* ================= HERO 3D WORLD ================= */
+
+.hero-world{
+  position:absolute;
+  width:760px;
+  height:760px;
+  right:-130px;
+  top:50%;
+  transform:translateY(-50%);
+  transition:transform .2s linear;
+}
+
+.globe{
+  position:absolute;
+  inset:100px;
+  border-radius:50%;
+  border:1px solid rgba(61,228,255,.17);
+  box-shadow:
+    inset 0 0 100px rgba(0,168,255,.06),
+    0 0 100px rgba(0,168,255,.05);
+}
+
+.globe::before,
+.globe::after{
+  content:"";
+  position:absolute;
+  inset:30px 120px;
+  border:1px solid rgba(61,228,255,.13);
+  border-radius:50%;
+}
+
+.globe::after{
+  transform:rotate(90deg);
+}
+
+.globe-line{
+  position:absolute;
+  left:80px;
+  right:80px;
+  top:50%;
+  border-top:1px solid rgba(61,228,255,.12);
+}
+
+.orbit{
+  position:absolute;
+  inset:65px;
+  border:1px dashed rgba(61,228,255,.2);
+  border-radius:50%;
+  transform:rotateX(66deg) rotateZ(-20deg);
+  animation:orbit 16s linear infinite;
+}
+
+@keyframes orbit{
+  to{
+    transform:rotateX(66deg) rotateZ(340deg);
+  }
+}
+
+.route{
+  position:absolute;
+  height:1px;
+  border-top:1px dashed rgba(61,228,255,.4);
+  border-radius:50%;
+}
+
+.route::after{
+  content:"";
+  position:absolute;
+  width:6px;
+  height:6px;
+  top:-4px;
+  left:0;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 18px var(--cyan);
+  animation:travel 5s linear infinite;
+}
+
+.route.r1{
+  width:390px;
+  left:5%;
+  top:45%;
+  transform:rotate(-17deg);
+}
+
+.route.r2{
+  width:320px;
+  right:5%;
+  top:57%;
+  transform:rotate(19deg);
+}
+
+@keyframes travel{
+  to{
+    left:100%;
+  }
+}
+
+.hub{
+  position:absolute;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 20px var(--cyan);
+}
+
+.hub::after{
+  content:"";
+  position:absolute;
+  inset:-11px;
+  border:1px solid rgba(61,228,255,.35);
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  to{
+    transform:scale(1.8);
+    opacity:0;
+  }
+}
+
+.hub.h1{left:25%;top:39%}
+.hub.h2{left:50%;top:30%}
+.hub.h3{left:72%;top:51%}
+.hub.h4{left:45%;top:68%}
+
+.plane{
+  position:absolute;
+  left:-20px;
+  top:55%;
+  font-size:28px;
+  filter:drop-shadow(0 0 12px var(--cyan));
+  animation:fly 8s linear infinite;
+}
+
+@keyframes fly{
+  0%{
+    left:-30px;
+    top:62%;
+    transform:rotate(-13deg);
+  }
+  50%{
+    left:50%;
+    top:25%;
+    transform:rotate(10deg);
+  }
+  100%{
+    left:105%;
+    top:47%;
+    transform:rotate(18deg);
+  }
+}
+
+/* ================= CONTAINERS ================= */
+
+.floating-container{
+  position:absolute;
+  width:120px;
+  height:57px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 18px,
+      rgba(255,255,255,.08) 18px 20px
+    ),
+    linear-gradient(135deg,#096d9e,#062d46);
+  border:1px solid rgba(61,228,255,.4);
+  box-shadow:0 25px 50px rgba(0,0,0,.4);
+  animation:float 6s ease-in-out infinite;
+}
+
+.floating-container::after{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:7px;
+  height:2px;
+  background:rgba(61,228,255,.3);
+}
+
+.fc1{
+  right:26%;
+  top:23%;
+  transform:rotate(-9deg);
+}
+
+.fc2{
+  right:7%;
+  bottom:24%;
+  transform:scale(.72) rotate(12deg);
+  animation-delay:1.5s;
+}
+
+@keyframes float{
+  0%,100%{
+    margin-top:0;
+  }
+  50%{
+    margin-top:-25px;
+  }
+}
+
+/* ================= SCROLL CUE ================= */
+
+.scroll-cue{
+  position:absolute;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:13px;
+  color:#657483;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-size:9px;
+}
+
+.scroll-line{
+  width:55px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan));
+  animation:cue 2s infinite;
+}
+
+@keyframes cue{
+  50%{
+    width:90px;
+    opacity:.3;
+  }
+}
+
+/* ================= TICKER ================= */
+
+.ticker{
+  overflow:hidden;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:#050b11;
+  white-space:nowrap;
+  padding:18px 0;
+}
+
+.ticker-track{
+  display:inline-flex;
+  gap:55px;
+  animation:ticker 30s linear infinite;
+}
+
+.ticker span{
+  color:#697785;
+  font-size:10px;
+  letter-spacing:2px;
+}
+
+.ticker strong{
+  color:var(--cyan);
+}
+
+@keyframes ticker{
+  to{
+    transform:translateX(-50%);
+  }
+}
+
+/* ================= COMMON ================= */
+
+section{
+  position:relative;
+  padding:145px 0;
+}
+
+.section-label{
+  color:var(--cyan);
+  text-transform:uppercase;
+  letter-spacing:2.5px;
+  font-size:10px;
+  margin-bottom:17px;
+}
+
+.section-heading{
+  font-family:"Space Grotesk";
+  font-size:clamp(42px,5vw,70px);
+  line-height:.95;
+  letter-spacing:-4px;
+}
+
+.section-description{
+  color:var(--muted);
+  line-height:1.8;
+  max-width:450px;
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(55px);
+  transition:
+    opacity 1s var(--ease),
+    transform 1s var(--ease);
+}
+
+.reveal.visible{
+  opacity:1;
+  transform:none;
+}
+
+/* ================= ABOUT ================= */
+
+.about{
+  overflow:hidden;
+}
+
+.about-grid{
+  display:grid;
+  grid-template-columns:1fr .9fr;
+  gap:100px;
+  align-items:center;
+}
+
+.about-copy p{
+  color:var(--muted);
+  line-height:1.8;
+  max-width:530px;
+  margin-top:25px;
+}
+
+.about-visual{
+  height:550px;
+  border:1px solid var(--line);
+  border-radius:30px;
+  overflow:hidden;
+  position:relative;
+  background:
+    linear-gradient(180deg,transparent 30%,rgba(0,0,0,.9)),
+    url("https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=1400&q=85")
+    center/cover;
+  transform:translateY(40px);
+  transition:transform 1.2s var(--ease);
+}
+
+.about-visual.visible{
+  transform:none;
+}
+
+.about-visual::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,rgba(0,168,255,.2),transparent 45%);
+}
+
+.about-stat{
+  position:absolute;
+  left:30px;
+  bottom:30px;
+}
+
+.about-stat strong{
+  display:block;
+  font-family:"Space Grotesk";
+  font-size:48px;
+}
+
+.about-stat span{
+  color:#a1aebb;
+  font-size:12px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-top:70px;
+}
+
+.stat{
+  border-top:1px solid var(--line);
+  padding-top:22px;
+}
+
+.stat-number{
+  font-family:"Space Grotesk";
+  font-size:43px;
+  letter-spacing:-2px;
+}
+
+.stat-label{
+  display:block;
+  color:#687785;
+  font-size:10px;
+  letter-spacing:1.5px;
+  margin-top:7px;
+}
+
+/* ================= HORIZONTAL SERVICES ================= */
+
+.services-section{
+  padding-top:110px;
+  padding-bottom:0;
+}
+
+.services-intro{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  margin-bottom:65px;
+}
+
+.horizontal-wrap{
+  height:400vh;
+  position:relative;
+}
+
+.horizontal-sticky{
+  height:100vh;
+  position:sticky;
+  top:0;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+}
+
+.services-track{
+  display:flex;
+  gap:20px;
+  width:max-content;
+  will-change:transform;
+}
+
+.service-card{
+  width:min(75vw,780px);
+  height:570px;
+  border:1px solid var(--line);
+  border-radius:35px;
+  overflow:hidden;
+  position:relative;
+  flex-shrink:0;
+  background:#07111a;
+}
+
+.service-bg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  transition:transform 1.2s var(--ease);
+}
+
+.service-card:hover .service-bg{
+  transform:scale(1.06);
+}
+
+.service-bg.air{
+  background-image:
+    linear-gradient(90deg,rgba(3,7,11,.92),rgba(3,7,11,.2)),
+    url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1600&q=85");
+}
+
+.service-bg.ocean{
+  background-image:
+    linear-gradient(90deg,rgba(3,7,11,.9),rgba(3,7,11,.2)),
+    url("https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=1600&q=85");
+}
+
+.service-bg.customs{
+  background-image:
+    linear-gradient(90deg,rgba(3,7,11,.94),rgba(3,7,11,.25)),
+    url("https://images.unsplash.com/photo-1586528116493-da8b4f0e6e4d?auto=format&fit=crop&w=1600&q=85");
+}
+
+.service-bg.warehouse{
+  background-image:
+    linear-gradient(90deg,rgba(3,7,11,.94),rgba(3,7,11,.2)),
+    url("https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&q=85");
+}
+
+.service-content{
+  position:absolute;
+  left:45px;
+  bottom:45px;
+  max-width:480px;
+  z-index:2;
+}
+
+.service-number{
+  color:var(--cyan);
+  font-size:11px;
+  letter-spacing:2px;
+}
+
+.service-title{
+  font-family:"Space Grotesk";
+  font-size:clamp(42px,6vw,76px);
+  letter-spacing:-4px;
+  line-height:.9;
+  margin-top:14px;
+}
+
+.service-text{
+  color:#a0adb8;
+  line-height:1.7;
+  margin-top:20px;
+  max-width:420px;
+}
+
+.service-icon{
+  position:absolute;
+  right:45px;
+  top:45px;
+  font-size:65px;
+  opacity:.7;
+}
+
+/* ================= SHIPMENT SCENE ================= */
+
+.shipment{
+  background:#040b11;
+  overflow:hidden;
+}
+
+.shipment-stage{
+  height:650px;
+  border:1px solid var(--line);
+  border-radius:35px;
+  overflow:hidden;
+  position:relative;
+  background:
+    radial-gradient(circle at 75% 22%,rgba(61,228,255,.16),transparent 20%),
+    linear-gradient(#061a28,#030b11);
+}
+
+.moon{
+  position:absolute;
+  width:110px;
+  height:110px;
+  right:12%;
+  top:13%;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff,#8fdfff 45%,#12627f);
+  box-shadow:0 0 80px rgba(61,228,255,.2);
+}
+
+.cloud{
+  position:absolute;
+  width:190px;
+  height:35px;
+  background:rgba(255,255,255,.035);
+  border-radius:50%;
+  filter:blur(6px);
+  animation:cloudMove 22s linear infinite;
+}
+
+.cloud.c1{
+  top:28%;
+  left:-20%;
+}
+
+.cloud.c2{
+  top:43%;
+  left:45%;
+  animation-duration:28s;
+}
+
+@keyframes cloudMove{
+  to{
+    transform:translateX(1400px);
+  }
+}
+
+.ocean{
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:100%;
+  height:43%;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(61,228,255,.07) 0 2px,
+      transparent 2px 18px
+    ),
+    linear-gradient(#062237,#020d15);
+}
+
+.ship{
+  position:absolute;
+  left:-390px;
+  bottom:22%;
+  width:390px;
+  height:115px;
+  animation:shipMove 13s linear infinite;
+}
+
+@keyframes shipMove{
+  to{
+    left:calc(100% + 420px);
+  }
+}
+
+.ship-body{
+  position:absolute;
+  bottom:0;
+  width:370px;
+  height:48px;
+  background:linear-gradient(135deg,#183849,#07151e);
+  clip-path:polygon(0 0,100% 0,88% 100%,8% 100%);
+  border-bottom:3px solid var(--cyan);
+}
+
+.ship-cabin{
+  position:absolute;
+  right:30px;
+  bottom:48px;
+  width:65px;
+  height:52px;
+  background:#193a4d;
+  border:1px solid rgba(255,255,255,.15);
+}
+
+.window{
+  display:inline-block;
+  width:12px;
+  height:12px;
+  margin:9px 2px;
+  background:var(--cyan);
+  box-shadow:0 0 12px var(--cyan);
+}
+
+.cargo{
+  position:absolute;
+  bottom:48px;
+  width:62px;
+  height:42px;
+  border:1px solid rgba(255,255,255,.15);
+}
+
+.cargo.a{left:45px;background:#087baa}
+.cargo.b{left:113px;background:#bd5931}
+.cargo.c{left:181px;background:#087b68}
+
+.ship-route{
+  position:absolute;
+  left:8%;
+  right:8%;
+  bottom:20%;
+  border-top:1px dashed rgba(61,228,255,.4);
+}
+
+.ship-marker{
+  position:absolute;
+  width:8px;
+  height:8px;
+  background:var(--cyan);
+  border-radius:50%;
+  top:-4px;
+  box-shadow:0 0 20px var(--cyan);
+  animation:marker 6s linear infinite;
+}
+
+@keyframes marker{
+  to{
+    left:100%;
+  }
+}
+
+.shipment-label{
+  position:absolute;
+  left:45px;
+  top:45px;
+  z-index:4;
+}
+
+.shipment-label h2{
+  font-family:"Space Grotesk";
+  font-size:clamp(34px,4vw,56px);
+  letter-spacing:-3px;
+  margin-top:10px;
+}
+
+.shipment-label p{
+  color:var(--muted);
+  margin-top:14px;
+}
+
+/* ================= NETWORK ================= */
+
+.network-section{
+  overflow:hidden;
+}
+
+.network-map{
+  height:680px;
+  border:1px solid var(--line);
+  border-radius:35px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at center,rgba(0,168,255,.09),transparent 42%),
+    #040b11;
+}
+
+.map-grid{
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(61,228,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(61,228,255,.05) 1px,transparent 1px);
+  background-size:45px 45px;
+}
+
+.land{
+  position:absolute;
+  background:rgba(18,77,103,.2);
+  border:1px solid rgba(61,228,255,.08);
+}
+
+.land.a{
+  width:300px;
+  height:170px;
+  left:5%;
+  top:25%;
+  border-radius:55% 35% 50% 35%;
+  transform:rotate(-20deg);
+}
+
+.land.b{
+  width:290px;
+  height:190px;
+  right:5%;
+  top:28%;
+  border-radius:35% 55% 40% 60%;
+  transform:rotate(15deg);
+}
+
+.land.c{
+  width:170px;
+  height:250px;
+  left:44%;
+  top:38%;
+  border-radius:45%;
+  transform:rotate(10deg);
+}
+
+.network-title{
+  position:absolute;
+  left:45px;
+  top:45px;
+  z-index:5;
+}
+
+.network-title h2{
+  font-family:"Space Grotesk";
+  font-size:clamp(42px,5vw,68px);
+  line-height:.9;
+  letter-spacing:-4px;
+}
+
+.network-route{
+  position:absolute;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:.45;
+  transform-origin:left;
+  animation:routeGlow 2.5s infinite;
+}
+
+.nr1{
+  width:310px;
+  left:20%;
+  top:45%;
+  transform:rotate(-18deg);
+}
+
+.nr2{
+  width:280px;
+  left:42%;
+  top:35%;
+  transform:rotate(35deg);
+}
+
+.nr3{
+  width:270px;
+  left:55%;
+  top:56%;
+  transform:rotate(-27deg);
+}
+
+@keyframes routeGlow{
+  50%{
+    opacity:1;
+  }
+}
+
+.network-hub{
+  position:absolute;
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 20px var(--cyan);
+  z-index:3;
+}
+
+.network-hub span{
+  position:absolute;
+  top:17px;
+  left:15px;
+  white-space:nowrap;
+  color:#8797a5;
+  font-size:9px;
+  letter-spacing:1px;
+}
+
+.nh1{left:20%;top:45%}
+.nh2{left:42%;top:35%}
+.nh3{left:55%;top:56%}
+.nh4{left:77%;top:41%}
+.nh5{left:68%;top:67%}
+
+/* ================= TRACKING ================= */
+
+.tracking{
+  padding-top:100px;
+}
+
+.tracking-grid{
+  display:grid;
+  grid-template-columns:.8fr 1.2fr;
+  gap:70px;
+  align-items:center;
+}
+
+.tracking-copy p{
+  color:var(--muted);
+  line-height:1.8;
+  margin-top:25px;
+}
+
+.tracking-ui{
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:28px;
+  background:#07111a;
+  position:relative;
+  overflow:hidden;
+}
+
+.tracking-top{
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+  padding-bottom:20px;
+}
+
+.tracking-id{
+  font-family:"Space Grotesk";
+  font-size:20px;
+}
+
+.status{
+  color:var(--green);
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+.track-route{
+  height:150px;
+  position:relative;
+  margin:30px 0;
+}
+
+.track-line{
+  position:absolute;
+  left:40px;
+  right:40px;
+  top:50%;
+  border-top:1px dashed rgba(61,228,255,.4);
+}
+
+.track-progress{
+  position:absolute;
+  left:40px;
+  top:50%;
+  width:58%;
+  border-top:2px solid var(--cyan);
+  box-shadow:0 0 15px var(--cyan);
+}
+
+.track-point{
+  position:absolute;
+  top:calc(50% - 4px);
+  width:9px;
+  height:9px;
+  background:var(--cyan);
+  border-radius:50%;
+  box-shadow:0 0 15px var(--cyan);
+}
+
+.track-point.start{left:35px}
+.track-point.end{right:35px}
+
+.tracker{
+  position:absolute;
+  left:58%;
+  top:calc(50% - 10px);
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 25px var(--cyan);
+  animation:trackerMove 4s ease-in-out infinite alternate;
+}
+
+@keyframes trackerMove{
+  to{
+    transform:translateX(180px);
+  }
+}
+
+.track-cities{
+  display:flex;
+  justify-content:space-between;
+  color:#7f8e9c;
+  font-size:11px;
+}
+
+.track-details{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.track-detail{
+  border-top:1px solid var(--line);
+  padding-top:15px;
+}
+
+.track-detail small{
+  color:#607180;
+  display:block;
+  font-size:9px;
+  margin-bottom:6px;
+}
+
+.track-detail strong{
+  font-size:13px;
+}
+
+/* ================= PROCESS ================= */
+
+.process-title{
+  margin-bottom:65px;
+}
+
+.process{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  border-top:1px solid var(--line);
+}
+
+.step{
+  padding:30px 18px;
+  border-right:1px solid var(--line);
+  min-height:220px;
+  position:relative;
+}
+
+.step:last-child{
+  border-right:0;
+}
+
+.step-number{
+  color:var(--cyan);
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+.step h3{
+  font-family:"Space Grotesk";
+  margin-top:40px;
+  font-size:19px;
+}
+
+.step p{
+  color:#687785;
+  font-size:12px;
+  line-height:1.7;
+  margin-top:10px;
+}
+
+.step-dot{
+  position:absolute;
+  top:-5px;
+  left:0;
+  width:9px;
+  height:9px;
+  background:#18232c;
+  border-radius:50%;
+  transition:.5s;
+}
+
+.step.active .step-dot{
+  background:var(--cyan);
+  box-shadow:0 0 20px var(--cyan);
+}
+
+/* ================= TESTIMONIAL ================= */
+
+.testimonial{
+  min-height:550px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:
+    radial-gradient(circle at center,rgba(0,168,255,.08),transparent 40%);
+}
+
+.testimonial-inner{
+  max-width:950px;
+}
+
+.quote{
+  font-family:"Space Grotesk";
+  font-size:clamp(32px,4.5vw,60px);
+  letter-spacing:-3px;
+  line-height:1.05;
+  margin-top:25px;
+}
+
+.client{
+  color:#768594;
+  margin-top:30px;
+  font-size:13px;
+}
+
+/* ================= CTA ================= */
+
+.cta{
+  min-height:700px;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 70% 50%,rgba(0,168,255,.15),transparent 30%),
+    #040a10;
+}
+
+.cta-orbit{
+  position:absolute;
+  width:650px;
+  height:650px;
+  right:-100px;
+  top:50%;
+  transform:translateY(-50%);
+  border:1px solid rgba(61,228,255,.15);
+  border-radius:50%;
+  animation:slowSpin 25s linear infinite;
+}
+
+@keyframes slowSpin{
+  to{
+    transform:translateY(-50%) rotate(360deg);
+  }
+}
+
+.cta-orbit::before,
+.cta-orbit::after{
+  content:"";
+  position:absolute;
+  inset:70px;
+  border:1px dashed rgba(61,228,255,.15);
+  border-radius:50%;
+}
+
+.cta-orbit::after{
+  inset:170px;
+}
+
+.cta-content{
+  position:relative;
+  z-index:3;
+}
+
+.cta h2{
+  font-family:"Space Grotesk";
+  font-size:clamp(65px,9vw,120px);
+  line-height:.82;
+  letter-spacing:-7px;
+}
+
+.cta p{
+  color:var(--muted);
+  max-width:420px;
+  line-height:1.8;
+  margin:30px 0;
+}
+
+/* ================= CONTACT ================= */
+
+.contact{
+  border-top:1px solid var(--line);
+}
+
+.contact-grid{
+  display:grid;
+  grid-template-columns:.8fr 1.2fr;
+  gap:80px;
+}
+
+.contact-copy p{
+  color:var(--muted);
+  line-height:1.8;
+  max-width:450px;
+  margin-top:25px;
+}
+
+.contact-info{
+  margin-top:35px;
+}
+
+.contact-info div{
+  margin-top:20px;
+}
+
+.contact-info small{
+  display:block;
+  color:#596977;
+  font-size:9px;
+  letter-spacing:1.5px;
+  margin-bottom:6px;
+}
+
+.contact-form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:13px;
+  padding:30px;
+  border:1px solid var(--line);
+  border-radius:28px;
+  background:rgba(255,255,255,.025);
+}
+
+.contact-form input,
+.contact-form select,
+.contact-form textarea{
+  width:100%;
+  color:#fff;
+  background:#071019;
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:15px;
+  outline:none;
+  transition:.3s;
+}
+
+.contact-form input:focus,
+.contact-form select:focus,
+.contact-form textarea:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 25px rgba(0,168,255,.06);
+}
+
+.contact-form textarea{
+  min-height:130px;
+  resize:vertical;
+  grid-column:1/-1;
+}
+
+.contact-form button{
+  border:0;
+  grid-column:1/-1;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+  border-top:1px solid var(--line);
+  padding:70px 0 25px;
+}
+
+.footer-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:40px;
+}
+
+.footer-description{
+  max-width:320px;
+  color:#657482;
+  line-height:1.7;
+  margin-top:16px;
+  font-size:13px;
+}
+
+footer h4{
+  font-size:13px;
+  margin-bottom:17px;
+}
+
+footer li{
+  list-style:none;
+  color:#687785;
+  font-size:12px;
+  margin:10px 0;
+}
+
+.copyright{
+  border-top:1px solid var(--line);
+  margin-top:55px;
+  padding-top:20px;
+  color:#4e5c68;
+  font-size:10px;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:1000px){
+
+  .nav-links,
+  .nav-cta{
+    display:none;
+  }
+
+  .menu{
+    display:block;
+  }
+
+  .hero-world{
+    right:-400px;
+    opacity:.5;
+  }
+
+  .about-grid,
+  .tracking-grid,
+  .contact-grid{
+    grid-template-columns:1fr;
+    gap:50px;
+  }
+
+  .services-intro{
+    display:block;
+  }
+
+  .services-intro .section-description{
+    margin-top:20px;
+  }
+
+  .process{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .step:nth-child(3){
+    border-right:0;
+  }
+
+  .footer-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:650px){
+
+  .container{
+    width:calc(100% - 28px);
+  }
+
+  section{
+    padding:95px 0;
+  }
+
+  .hero{
+    min-height:850px;
+  }
+
+  .hero-content{
+    padding-top:80px;
+  }
+
+  .hero h1{
+    font-size:57px;
+    letter-spacing:-4px;
+  }
+
+  .hero-world{
+    width:600px;
+    height:600px;
+    right:-400px;
+    top:62%;
+    opacity:.35;
+  }
+
+  .hero-actions{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .about-visual{
+    height:380px;
+  }
+
+  .horizontal-wrap{
+    height:auto;
+  }
+
+  .horizontal-sticky{
+    height:auto;
+    overflow:visible;
+  }
+
+  .services-track{
+    width:100%;
+    flex-direction:column;
+  }
+
+  .service-card{
+    width:100%;
+    height:480px;
+  }
+
+  .service-content{
+    left:25px;
+    bottom:25px;
+  }
+
+  .service-icon{
+    right:25px;
+    top:25px;
+  }
+
+  .shipment-stage,
+  .network-map{
+    height:500px;
+  }
+
+  .shipment-label{
+    left:25px;
+    top:25px;
+  }
+
+  .ship{
+    transform:scale(.75);
+    transform-origin:center;
+  }
+
+  .network-title{
+    left:25px;
+    top:25px;
+  }
+
+  .network-route{
+    opacity:.25;
+  }
+
+  .tracking-ui{
+    padding:20px;
+  }
+
+  .track-details{
+    grid-template-columns:1fr;
+  }
+
+  .process{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .step{
+    min-height:180px;
+  }
+
+  .step:nth-child(even){
+    border-right:0;
+  }
+
+  .quote{
+    font-size:32px;
+  }
+
+  .cta{
+    min-height:550px;
+  }
+
+  .cta h2{
+    font-size:70px;
+    letter-spacing:-5px;
+  }
+
+  .cta-orbit{
+    width:480px;
+    height:480px;
+    right:-300px;
+  }
+
+  .contact-form{
+    grid-template-columns:1fr;
+    padding:20px;
+  }
+
+  .contact-form textarea,
+  .contact-form button{
+    grid-column:auto;
+  }
+
+  .footer-grid{
+    grid-template-columns:1fr;
+  }
+
+  .cursor,
+  .cursor-ring{
+    display:none;
+  }
+}
+
+/* REDUCED MOTION */
+
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    scroll-behavior:auto !important;
+    transition-duration:.01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="noise"></div>
+<div class="scroll-progress"></div>
+
+<div class="cursor"></div>
+<div class="cursor-ring"></div>
+
+<!-- ================= NAV ================= -->
+
+<nav class="nav" id="nav">
+  <div class="container nav-inner">
+
+    <a href="#" class="logo">VORT<span>EX</span></a>
+
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#network">Network</a>
+      <a href="#process">Process</a>
+      <a href="#contact">Contact</a>
+    </div>
+
+    <a href="#contact" class="nav-cta magnetic">
+      Get a Quote
+    </a>
+
+    <button class="menu" id="menu">☰</button>
+
+  </div>
+</nav>
+
+
+<!-- ================= HERO ================= -->
+
+<header class="hero" id="home">
+
+  <div class="hero-grid"></div>
+
+  <div class="hero-world" id="heroWorld">
+
+    <div class="globe">
+      <div class="globe-line"></div>
+    </div>
+
+    <div class="orbit"></div>
+
+    <div class="route r1"></div>
+    <div class="route r2"></div>
+
+    <div class="hub h1"></div>
+    <div class="hub h2"></div>
+    <div class="hub h3"></div>
+    <div class="hub h4"></div>
+
+    <div class="plane">✈</div>
+
+    <div class="floating-container fc1"></div>
+    <div class="floating-container fc2"></div>
+
+  </div>
+
+  <div class="container">
+
+    <div class="hero-content">
+
+      <div class="eyebrow reveal">
+        <span class="live-dot"></span>
+        Global Logistics Network
+      </div>
+
+      <h1 class="reveal">
+        MOVE<br>
+        <span class="outline">WITHOUT</span><br>
+        LIMITS.
+      </h1>
+
+      <p class="hero-sub reveal">
+        Next-generation freight forwarding for businesses
+        that move products, ideas and opportunities across
+        the world.
+      </p>
+
+      <div class="hero-actions reveal">
+
+        <a href="#contact" class="btn btn-primary magnetic">
+          Start Shipping →
+        </a>
+
+        <a href="#services" class="btn btn-outline">
+          Explore Services
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="scroll-cue">
+    <span>Scroll to explore</span>
+    <div class="scroll-line"></div>
+  </div>
+
+</header>
+
+
+<!-- ================= TICKER ================= -->
+
+<div class="ticker">
+
+  <div class="ticker-track">
+
+    <span>✦ <strong>AIR FREIGHT</strong></span>
+    <span>✦ OCEAN FREIGHT</span>
+    <span>✦ CUSTOMS CLEARANCE</span>
+    <span>✦ WAREHOUSING</span>
+    <span>✦ GLOBAL DISTRIBUTION</span>
+    <span>✦ REAL-TIME TRACKING</span>
+
+    <span>✦ <strong>AIR FREIGHT</strong></span>
+    <span>✦ OCEAN FREIGHT</span>
+    <span>✦ CUSTOMS CLEARANCE</span>
+    <span>✦ WAREHOUSING</span>
+    <span>✦ GLOBAL DISTRIBUTION</span>
+    <span>✦ REAL-TIME TRACKING</span>
+
+  </div>
+
+</div>
+
+
+<!-- ================= ABOUT ================= -->
+
+<section id="about" class="about">
+
+  <div class="container">
+
+    <div class="about-grid">
+
+      <div class="about-copy">
+
+        <div class="section-label reveal">
+          01 — About Vortex
+        </div>
+
+        <h2 class="section-heading reveal">
+          Logistics<br>
+          engineered<br>
+          differently.
+        </h2>
+
+        <p class="reveal">
+          We connect businesses to the world through
+          intelligent freight solutions, global carrier
+          networks and experienced logistics specialists.
+        </p>
+
+        <p class="reveal">
+          Every shipment is planned around speed,
+          reliability, visibility and your business goals.
+        </p>
+
+      </div>
+
+      <div class="about-visual reveal"></div>
+
+    </div>
+
+
+    <div class="stats">
+
+      <div class="stat reveal">
+        <div class="stat-number" data-count="15">0</div>
+        <span class="stat-label">YEARS EXPERIENCE</span>
+      </div>
+
+      <div class="stat reveal">
+        <div class="stat-number" data-count="80">0</div>
+        <span class="stat-label">COUNTRIES</span>
+      </div>
+
+      <div class="stat reveal">
+        <div class="stat-number" data-count="25">0</div>
+        <span class="stat-label">K+ SHIPMENTS</span>
+      </div>
+
+      <div class="stat reveal">
+        <div class="stat-number" data-count="98">0</div>
+        <span class="stat-label">% ON-TIME</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= SERVICES ================= -->
+
+<section id="services" class="services-section">
+
+  <div class="container">
+
+    <div class="services-intro">
+
+      <div>
+
+        <div class="section-label reveal">
+          02 — Services
+        </div>
+
+        <h2 class="section-heading reveal">
+          Everything<br>
+          moves here.
+        </h2>
+
+      </div>
+
+      <p class="section-description reveal">
+        From urgent air cargo to full container ocean
+        shipments, we engineer logistics around your
+        deadlines.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="horizontal-wrap">
+
+    <div class="horizontal-sticky">
+
+      <div class="services-track" id="servicesTrack">
+
+        <article class="service-card">
+
+          <div class="service-bg air"></div>
+
+          <div class="service-icon">✈</div>
+
+          <div class="service-content">
+
+            <div class="service-number">01 / AIR</div>
+
+            <h3 class="service-title">
+              AIR<br>FREIGHT
+            </h3>
+
+            <p class="service-text">
+              Time-critical cargo delivered through
+              global air freight networks with
+              precision and visibility.
+            </p>
+
+          </div>
+
+        </article>
+
+
+        <article class="service-card">
+
+          <div class="service-bg ocean"></div>
+
+          <div class="service-icon">⚓</div>
+
+          <div class="service-content">
+
+            <div class="service-number">02 / OCEAN</div>
+
+            <h3 class="service-title">
+              OCEAN<br>FREIGHT
+            </h3>
+
+            <p class="service-text">
+              FCL and LCL solutions connecting
+              major ports and supply chains worldwide.
+            </p>
+
+          </div>
+
+        </article>
+
+
+        <article class="service-card">
+
+          <div class="service-bg customs"></div>
+
+          <div class="service-icon">◎</div>
+
+          <div class="service-content">
+
+            <div class="service-number">03 / CUSTOMS</div>
+
+            <h3 class="service-title">
+              CUSTOMS<br>CLEARANCE
+            </h3>
+
+            <p class="service-text">
+              Documentation, brokerage and compliance
+              managed by experienced specialists.
+            </p>
+
+          </div>
+
+        </article>
+
+
+        <article class="service-card">
+
+          <div class="service-bg warehouse"></div>
+
+          <div class="service-icon">▦</div>
+
+          <div class="service-content">
+
+            <div class="service-number">04 / STORAGE</div>
+
+            <h3 class="service-title">
+              WAREHOUSE<br>& DISTRIBUTION
+            </h3>
+
+            <p class="service-text">
+              Secure storage, inventory management
+              and intelligent distribution.
+            </p>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= SHIPMENT ================= -->
+
+<section class="shipment">
+
+  <div class="container">
+
+    <div class="section-label reveal">
+      03 — Always moving
+    </div>
+
+    <h2 class="section-heading reveal">
+      Your cargo<br>
+      never stands still.
+    </h2>
+
+    <div class="shipment-stage reveal" style="margin-top:55px">
+
+      <div class="moon"></div>
+
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
+
+      <div class="shipment-label">
+
+        <div class="section-label">
+          LIVE ROUTE
+        </div>
+
+        <h2>
+          Singapore → Rotterdam
+        </h2>
+
+        <p>
+          Ocean freight · ETA 14 days
+        </p>
+
+      </div>
+
+      <div class="ocean"></div>
+
+      <div class="ship">
+
+        <div class="ship-body"></div>
+
+        <div class="ship-cabin">
+          <span class="window"></span>
+          <span class="window"></span>
+        </div>
+
+        <div class="cargo a"></div>
+        <div class="cargo b"></div>
+        <div class="cargo c"></div>
+
+      </div>
+
+      <div class="ship-route">
+        <div class="ship-marker"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= NETWORK ================= -->
+
+<section id="network" class="network-section">
+
+  <div class="container">
+
+    <div class="section-label reveal">
+      04 — Global Network
+    </div>
+
+    <h2 class="section-heading reveal">
+      One planet.<br>
+      Infinite routes.
+    </h2>
+
+    <div class="network-map reveal" style="margin-top:55px">
+
+      <div class="map-grid"></div>
+
+      <div class="land a"></div>
+      <div class="land b"></div>
+      <div class="land c"></div>
+
+      <div class="network-title">
+        <div class="section-label">CONNECTED WORLD</div>
+      </div>
+
+      <div class="network-route nr1"></div>
+      <div class="network-route nr2"></div>
+      <div class="network-route nr3"></div>
+
+      <div class="network-hub nh1">
+        <span>NEW YORK</span>
+      </div>
+
+      <div class="network-hub nh2">
+        <span>LONDON</span>
+      </div>
+
+      <div class="network-hub nh3">
+        <span>DUBAI</span>
+      </div>
+
+      <div class="network-hub nh4">
+        <span>ROTTERDAM</span>
+      </div>
+
+      <div class="network-hub nh5">
+        <span>SINGAPORE</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= TRACKING ================= -->
+
+<section class="tracking">
+
+  <div class="container">
+
+    <div class="tracking-grid">
+
+      <div class="tracking-copy">
+
+        <div class="section-label reveal">
+          05 — Visibility
+        </div>
+
+        <h2 class="section-heading reveal">
+          Know where<br>
+          everything is.
+        </h2>
+
+        <p class="reveal">
+          From pickup to final delivery, every shipment
+          is monitored through a clear digital tracking
+          experience.
+        </p>
+
+        <a href="#contact" class="btn btn-outline reveal" style="margin-top:30px">
+          Track Your Shipment →
+        </a>
+
+      </div>
+
+
+      <div class="tracking-ui reveal">
+
+        <div class="tracking-top">
+
+          <div class="tracking-id">
+            VX-20491
+          </div>
+
+          <div class="status">
+            ● IN TRANSIT
+          </div>
+
+        </div>
+
+        <div class="track-route">
+
+          <div class="track-line"></div>
+          <div class="track-progress"></div>
+
+          <div class="track-point start"></div>
+          <div class="track-point end"></div>
+
+          <div class="tracker"></div>
+
+        </div>
+
+        <div class="track-cities">
+
+          <span>SINGAPORE</span>
+          <span>ROTTERDAM</span>
+
+        </div>
+
+        <div class="track-details" style="margin-top:30px">
+
+          <div class="track-detail">
+            <small>STATUS</small>
+            <strong>In Transit</strong>
+          </div>
+
+          <div class="track-detail">
+            <small>ETA</small>
+            <strong>14 Days</strong>
+          </div>
+
+          <div class="track-detail">
+            <small>MODE</small>
+            <strong>Ocean</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= PROCESS ================= -->
+
+<section id="process">
+
+  <div class="container">
+
+    <div class="process-title">
+
+      <div class="section-label reveal">
+        06 — Our Process
+      </div>
+
+      <h2 class="section-heading reveal">
+        Simple.<br>
+        Transparent.
+      </h2>
+
+    </div>
+
+
+    <div class="process">
+
+      <div class="step reveal active">
+        <div class="step-dot"></div>
+        <span class="step-number">01</span>
+        <h3>Request</h3>
+        <p>Tell us what you're shipping.</p>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-dot"></div>
+        <span class="step-number">02</span>
+        <h3>Plan</h3>
+        <p>We engineer the optimal route.</p>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-dot"></div>
+        <span class="step-number">03</span>
+        <h3>Pickup</h3>
+        <p>Cargo is collected securely.</p>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-dot"></div>
+        <span class="step-number">04</span>
+        <h3>Transit</h3>
+        <p>Shipment moves across borders.</p>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-dot"></div>
+        <span class="step-number">05</span>
+        <h3>Customs</h3>
+        <p>Documentation handled.</p>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-dot"></div>
+        <span class="step-number">06</span>
+        <h3>Delivery</h3>
+        <p>Your cargo arrives safely.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= TESTIMONIAL ================= -->
+
+<section class="testimonial">
+
+  <div class="container">
+
+    <div class="testimonial-inner reveal">
+
+      <div class="section-label">
+        07 — Client Experience
+      </div>
+
+      <div class="quote">
+        “They don't just move our cargo.
+        They make global logistics feel effortless.”
+      </div>
+
+      <div class="client">
+        Daniel Carter · COO, Meridian Industries
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= CTA ================= -->
+
+<section class="cta">
+
+  <div class="cta-orbit"></div>
+
+  <div class="container">
+
+    <div class="cta-content">
+
+      <div class="section-label reveal">
+        08 — Start Moving
+      </div>
+
+      <h2 class="reveal">
+        READY<br>
+        TO MOVE?
+      </h2>
+
+      <p class="reveal">
+        Tell us where your cargo needs to go.
+        We'll engineer the route.
+      </p>
+
+      <a href="#contact" class="btn btn-primary magnetic reveal">
+        Get a Quote →
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= CONTACT ================= -->
+
+<section id="contact" class="contact">
+
+  <div class="container">
+
+    <div class="contact-grid">
+
+      <div class="contact-copy">
+
+        <div class="section-label reveal">
+          09 — Contact
+        </div>
+
+        <h2 class="section-heading reveal">
+          Let's move<br>
+          something.
+        </h2>
+
+        <p class="reveal">
+          Tell us where your cargo is coming from,
+          where it needs to go and what you're shipping.
+          We'll handle the rest.
+        </p>
+
+        <div class="contact-info reveal">
+
+          <div>
+            <small>EMAIL</small>
+            hello@vortexlogistics.com
+          </div>
+
+          <div>
+            <small>PHONE</small>
+            +1 800 555 0199
+          </div>
+
+          <div>
+            <small>HEADQUARTERS</small>
+            Singapore · Dubai · Rotterdam
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <form class="contact-form reveal" id="quoteForm">
+
+        <input type="text" placeholder="Your Name" required>
+
+        <input type="text" placeholder="Company">
+
+        <input type="email" placeholder="Email" required>
+
+        <input type="tel" placeholder="Phone">
+
+        <select>
+          <option>Select Service</option>
+          <option>Air Freight</option>
+          <option>Ocean Freight</option>
+          <option>Customs Clearance</option>
+          <option>Warehousing</option>
+          <option>Distribution</option>
+        </select>
+
+        <input type="text" placeholder="Destination">
+
+        <textarea
+          placeholder="Tell us about your shipment..."
+        ></textarea>
+
+        <button type="submit" class="btn btn-primary">
+          Request a Quote →
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+  <div class="container">
+
+    <div class="footer-grid">
+
+      <div>
+
+        <div class="logo">
+          VORT<span>EX</span>
+        </div>
+
+        <p class="footer-description">
+          Moving business. Connecting the world.
+          A logistics partner built for companies
+          that refuse to stand still.
+        </p>
+
+      </div>
+
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li>Air Freight</li>
+          <li>Ocean Freight</li>
+          <li>Customs</li>
+          <li>Warehousing</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li>About</li>
+          <li>Network</li>
+          <li>Process</li>
+          <li>Contact</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Social</h4>
+        <ul>
+          <li>LinkedIn</li>
+          <li>Instagram</li>
+          <li>Facebook</li>
+          <li>X / Twitter</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="copyright">
+      © 2026 VORTEX Logistics. All rights reserved.
+    </div>
+
+  </div>
+
+</footer>
+
+
+<script>
+
+/* =========================================================
+   SMOOTH SCROLL ENGINE
+========================================================= */
+
+let currentScroll = window.scrollY;
+let targetScroll = window.scrollY;
+let isTouch = "ontouchstart" in window;
+
+if(!isTouch){
+
+  window.addEventListener("wheel",(e)=>{
+
+    e.preventDefault();
+
+    targetScroll += e.deltaY;
+
+    targetScroll = Math.max(
+      0,
+      Math.min(
+        targetScroll,
+        document.documentElement.scrollHeight - window.innerHeight
+      )
+    );
+
+  },{passive:false});
+
+  function smoothScroll(){
+
+    currentScroll +=
+      (targetScroll-currentScroll)*0.075;
+
+    window.scrollTo(0,currentScroll);
+
+    requestAnimationFrame(smoothScroll);
+  }
+
+  smoothScroll();
+
+}else{
+
+  window.addEventListener("scroll",()=>{
+    currentScroll=window.scrollY;
+    targetScroll=window.scrollY;
+  });
+
+}
+
+
+/* =========================================================
+   SCROLL PROGRESS
+========================================================= */
+
+const progress =
+  document.querySelector(".scroll-progress");
+
+function updateProgress(){
+
+  const max =
+    document.documentElement.scrollHeight-window.innerHeight;
+
+  const percent =
+    max > 0 ? currentScroll/max*100 : 0;
+
+  progress.style.width=percent+"%";
+
+}
+
+
+/* =========================================================
+   NAV
+========================================================= */
+
+const nav=document.getElementById("nav");
+
+function updateNav(){
+
+  nav.classList.toggle(
+    "scrolled",
+    currentScroll>70
+  );
+
+}
+
+
+/* =========================================================
+   HERO PARALLAX
+========================================================= */
+
+const heroWorld =
+  document.getElementById("heroWorld");
+
+let mouseX=0;
+let mouseY=0;
+
+window.addEventListener("mousemove",(e)=>{
+
+  mouseX =
+    e.clientX/window.innerWidth-.5;
+
+  mouseY =
+    e.clientY/window.innerHeight-.5;
+
+});
+
+function heroParallax(){
+
+  if(window.innerWidth>900){
+
+    const scrollEffect =
+      Math.min(currentScroll*.035,30);
+
+    heroWorld.style.transform=
+      `translate(${mouseX*25}px,
+      calc(-50% + ${mouseY*25-scrollEffect}px))
+      rotate(${mouseX*1.5}deg)`;
+
+  }
+
+}
+
+
+/* =========================================================
+   CURSOR
+========================================================= */
+
+const cursor=document.querySelector(".cursor");
+const ring=document.querySelector(".cursor-ring");
+
+let ringX=0;
+let ringY=0;
+
+window.addEventListener("mousemove",(e)=>{
+
+  cursor.style.left=e.clientX+"px";
+  cursor.style.top=e.clientY+"px";
+
+  mouseX=e.clientX/window.innerWidth-.5;
+  mouseY=e.clientY/window.innerHeight-.5;
+
+});
+
+function cursorLoop(){
+
+  ringX +=
+    (mouseX*window.innerWidth-ringX)*.13;
+
+  ringY +=
+    (mouseY*window.innerHeight-ringY)*.13;
+
+  ring.style.left=ringX+"px";
+  ring.style.top=ringY+"px";
+
+  requestAnimationFrame(cursorLoop);
+}
+
+if(!isTouch){
+  cursorLoop();
+}
+
+
+/* =========================================================
+   REVEAL OBSERVER
+========================================================= */
+
+const revealObserver =
+  new IntersectionObserver((entries)=>{
+
+    entries.forEach(entry=>{
+
+      if(entry.isIntersecting){
+
+        entry.target.classList.add("visible");
+
+        if(entry.target.classList.contains("stat")){
+
+          const number=
+            entry.target.querySelector(".stat-number");
+
+          animateCounter(number);
+
+        }
+
+        revealObserver.unobserve(entry.target);
+
+      }
+
+    });
+
+  },{
+    threshold:.12
+  });
+
+document.querySelectorAll(".reveal")
+.forEach(el=>revealObserver.observe(el));
+
+
+/* =========================================================
+   COUNTERS
+========================================================= */
+
+function animateCounter(el){
+
+  if(!el || el.dataset.done) return;
+
+  el.dataset.done="true";
+
+  const target=
+    parseInt(el.dataset.count);
+
+  const start=performance.now();
+  const duration=1500;
+
+  function frame(now){
+
+    const progress=
+      Math.min((now-start)/duration,1);
+
+    const eased=
+      1-Math.pow(1-progress,4);
+
+    el.textContent=
+      Math.floor(target*eased);
+
+    if(progress<1){
+
+      requestAnimationFrame(frame);
+
+    }else{
+
+      el.textContent=target;
+
+    }
+
+  }
+
+  requestAnimationFrame(frame);
+}
+
+
+/* =========================================================
+   HORIZONTAL SCROLL SERVICES
+========================================================= */
+
+const horizontalWrap=
+  document.querySelector(".horizontal-wrap");
+
+const servicesTrack=
+  document.getElementById("servicesTrack");
+
+function updateHorizontal(){
+
+  if(window.innerWidth<=650){
+
+    servicesTrack.style.transform="";
+
+    return;
+
+  }
+
+  const rect=
+    horizontalWrap.getBoundingClientRect();
+
+  const maxScroll=
+    horizontalWrap.offsetHeight-window.innerHeight;
+
+  const progress=
+    Math.max(
+      0,
+      Math.min(
+        1,
+        -rect.top/maxScroll
+      )
+    );
+
+  const trackWidth=
+    servicesTrack.scrollWidth;
+
+  const maxMove=
+    trackWidth-window.innerWidth;
+
+  const move=
+    progress*maxMove;
+
+  servicesTrack.style.transform=
+    `translate3d(${-move}px,0,0)`;
+
+}
+
+
+/* =========================================================
+   PROCESS ACTIVE STATES
+========================================================= */
+
+const steps=
+  document.querySelectorAll(".step");
+
+function updateProcess(){
+
+  const process=
+    document.querySelector(".process");
+
+  const rect=
+    process.getBoundingClientRect();
+
+  const progress=
+    Math.max(
+      0,
+      Math.min(
+        1,
+        (window.innerHeight*.65-rect.top)/
+        process.offsetHeight
+      )
+    );
+
+  const index=
+    Math.min(
+      steps.length-1,
+      Math.floor(progress*steps.length)
+    );
+
+  steps.forEach((step,i)=>{
+
+    step.classList.toggle(
+      "active",
+      i<=index
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   MAGNETIC BUTTONS
+========================================================= */
+
+document.querySelectorAll(".magnetic")
+.forEach(button=>{
+
+  button.addEventListener("mousemove",(e)=>{
+
+    if(window.innerWidth<800) return;
+
+    const rect=
+      button.getBoundingClientRect();
+
+    const x=
+      e.clientX-rect.left-rect.width/2;
+
+    const y=
+      e.clientY-rect.top-rect.height/2;
+
+    button.style.transform=
+      `translate(${x*.12}px,${y*.12}px)`;
+
+  });
+
+  button.addEventListener("mouseleave",()=>{
+
+    button.style.transform="";
+
+  });
+
+});
+
+
+/* =========================================================
+   HOVER CURSOR
+========================================================= */
+
+document.querySelectorAll(
+  "a,button,.service-card,.network-hub"
+).forEach(el=>{
+
+  el.addEventListener("mouseenter",()=>{
+
+    if(isTouch) return;
+
+    ring.style.width="60px";
+    ring.style.height="60px";
+    ring.style.background=
+      "rgba(61,228,255,.05)";
+
+  });
+
+  el.addEventListener("mouseleave",()=>{
+
+    if(isTouch) return;
+
+    ring.style.width="38px";
+    ring.style.height="38px";
+    ring.style.background="transparent";
+
+  });
+
+});
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+const form=
+  document.getElementById("quoteForm");
+
+form.addEventListener("submit",(e)=>{
+
+  e.preventDefault();
+
+  const button=
+    form.querySelector("button");
+
+  button.textContent=
+    "Request Received ✓";
+
+  button.style.background=
+    "linear-gradient(120deg,#36e5a1,#0fbf82)";
+
+  button.style.color="#00130d";
+
+  setTimeout(()=>{
+
+    form.reset();
+
+    button.textContent=
+      "Request a Quote →";
+
+    button.style.background=
+      "";
+
+  },3000);
+
+});
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+const menu=
+  document.getElementById("menu");
+
+const links=
+  document.querySelector(".nav-links");
+
+menu.addEventListener("click",()=>{
+
+  const opened=
+    links.classList.toggle("mobile-open");
+
+  if(opened){
+
+    links.style.display="flex";
+    links.style.position="absolute";
+    links.style.left="14px";
+    links.style.right="14px";
+    links.style.top="65px";
+    links.style.padding="25px";
+    links.style.flexDirection="column";
+    links.style.background="rgba(3,7,11,.97)";
+    links.style.border="1px solid rgba(255,255,255,.1)";
+    links.style.borderRadius="22px";
+    links.style.backdropFilter="blur(20px)";
+
+  }else{
+
+    links.style.display="none";
+
+  }
+
+});
+
+
+/* =========================================================
+   MAIN ANIMATION LOOP
+========================================================= */
+
+function animationLoop(){
+
+  updateProgress();
+  updateNav();
+  heroParallax();
+  updateHorizontal();
+  updateProcess();
+
+  requestAnimationFrame(animationLoop);
+
+}
+
+animationLoop();
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener("resize",()=>{
+
+  targetScroll=
+    Math.min(
+      targetScroll,
+      document.documentElement.scrollHeight-window.innerHeight
+    );
+
+});
+
+</script>
+
+</body>
+</html>
